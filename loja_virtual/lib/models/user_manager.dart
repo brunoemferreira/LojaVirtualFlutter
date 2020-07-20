@@ -34,11 +34,28 @@ class UserManager extends ChangeNotifier {
     loading = false;
   }
 
+  // Cadastro do Usuário
+  Future<void> signUp({User user, Function onFail, Function onSuccess}) async {
+    loading = true;
+    try {
+      final AuthResult result = await auth.createUserWithEmailAndPassword(
+          email: user.email, password: user.password);
+
+      this.user = result.user;
+
+      onSuccess();
+    } on PlatformException catch (e){
+      onFail(getErrorString(e.code));
+    }
+    loading = false;
+  }
+
   set loading(bool value) {
     _loading = value;
     notifyListeners();
   }
 
+  // Carrega o usuário Corrente
   Future<void> _loadCurrentUser() async {
     final FirebaseUser currentUser = await auth.currentUser();
     if (currentUser != null) {
